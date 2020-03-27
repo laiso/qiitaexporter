@@ -22,6 +22,7 @@ var (
 	flagImgDir        = flag.String("imgdir", "images", "image dir")
 	flagPostDir       = flag.String("postdir", "posts", "posts dir")
 	flagTmplFile      = flag.String("template", "", "template file")
+	flagImgIgnore      = flag.Bool("imgignore", false, "no image tag replacement")
 
 	imgRegexp = regexp.MustCompile(`https://qiita-image-store\.s3\.amazonaws\.com/.+\.png`)
 )
@@ -160,8 +161,10 @@ func download100(page int) (hasNext bool, rerr error) {
 			continue
 		}
 
-		if err := items[i].ImageToLocal(imgdir); err != nil {
-			return false, err
+		if !*flagImgIgnore {
+			if err := items[i].ImageToLocal(imgdir); err != nil {
+				return false, err
+			}
 		}
 
 		fname := fmt.Sprintf("%s-qiita-%s.ja.md", items[i].Date(), items[i].ID)
